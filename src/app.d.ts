@@ -8,6 +8,10 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 	}
+
+	namespace grecaptcha {
+		declare function getResponse(widgetId?: number): any
+	}
 }
 
-export {};
+export { };

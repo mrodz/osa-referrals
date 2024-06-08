@@ -1,16 +1,61 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { goto } from "$app/navigation";
+
+  let parentName: string;
+  let parentEmail: string;
+  let parentPhone: string;
+  let childName: string;
+  let childSchool: string;
+  let childGrade: number = 0;
+  let childTeacher: string;
+  let wantsReading: boolean;
+  let wantsMath: boolean;
+  let story: string;
 
   const onSubmit = async () => {
     const captchaObject = grecaptcha.getResponse();
 
-	if (typeof captchaObject !== "string" || captchaObject.length === 0) {
-		alert("Please confirm that you are not a robot");
-		return;
-	}
-	
-	console.log(captchaObject, typeof captchaObject);
-  }
+    if (typeof captchaObject !== "string" || captchaObject.length === 0) {
+      alert("Please confirm that you are not a robot");
+      return;
+    }
+
+    try {
+      const x = await fetch(
+        "http://127.0.0.1:5001/osa-software/us-central1/recordResponse",
+        {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            parent: {
+              name: parentName,
+              email: parentEmail,
+              phone: parentPhone,
+            },
+            child: {
+              name: childName,
+              school: childSchool,
+              grade: childGrade,
+              teacher: childTeacher,
+            },
+            math: wantsMath ?? false,
+            reading: wantsReading ?? false,
+            story,
+          }),
+        }
+      );
+      console.log(x);
+      alert(
+        "Your response was recorded! We will write you via email within the next few business days; please check your inbox."
+      );
+      goto("/thanks");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 </script>
 
 <svelte:head>
@@ -20,12 +65,13 @@
 <div>
   <h1 class="h1 my-4">Parents</h1>
 
-  <form class="max-w-sm mx-auto" on:submit|preventDefault={onSubmit}>
+  <form class="max-w-sm mx-auto mb-14" on:submit|preventDefault={onSubmit}>
     <div class="mb-5">
       <label for="name" class="block mb-2 text-sm font-medium text-gray-900">
         Your name
       </label>
       <input
+        bind:value={parentName}
         type="text"
         id="name"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -38,6 +84,7 @@
         Your email
       </label>
       <input
+        bind:value={parentEmail}
         type="email"
         id="email"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -69,6 +116,7 @@
           </svg>
         </div>
         <input
+          bind:value={parentPhone}
           type="tel"
           id="phone-input"
           aria-describedby="helper-text-explanation"
@@ -90,6 +138,7 @@
         Child's name
       </label>
       <input
+        bind:value={childName}
         type="text"
         id="child-name"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -104,6 +153,7 @@
       </label>
 
       <select
+        bind:value={childSchool}
         name="school"
         id="school"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -125,6 +175,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 0)}
             id="grade-option-1"
             type="radio"
             name="countries"
@@ -142,6 +193,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 1)}
             id="grade-option-2"
             type="radio"
             name="countries"
@@ -158,6 +210,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 2)}
             id="grade-option-3"
             type="radio"
             name="countries"
@@ -174,6 +227,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 3)}
             id="grade-option-4"
             type="radio"
             name="countries"
@@ -190,6 +244,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 4)}
             id="grade-option-5"
             type="radio"
             name="countries"
@@ -206,6 +261,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            on:click={() => (childGrade = 5)}
             id="grade-option-6"
             type="radio"
             name="countries"
@@ -227,6 +283,7 @@
         Child's teacher
       </label>
       <input
+        bind:value={childTeacher}
         type="text"
         id="teacher"
         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
@@ -247,6 +304,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            bind:checked={wantsMath}
             id="checkbox-2"
             type="checkbox"
             value=""
@@ -262,6 +320,7 @@
 
         <div class="flex items-center mb-4">
           <input
+            bind:checked={wantsReading}
             id="checkbox-3"
             type="checkbox"
             value=""
@@ -282,6 +341,7 @@
         >Tell us about your child and your situation</label
       >
       <textarea
+        bind:value={story}
         maxlength="500"
         id="message"
         rows="4"
@@ -297,7 +357,7 @@
 
     <button
       type="submit"
-      class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+      class="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
     >
       Submit
     </button>

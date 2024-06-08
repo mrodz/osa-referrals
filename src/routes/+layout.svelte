@@ -60,8 +60,8 @@
 </script>
 
 <div>
-  <header class="bg-green-500 grid grid-cols-[1fr_auto] items-center [&>*]:p-2">
-    <div>
+  <header class="bg-[#475a3e] grid grid-cols-[1fr_auto] items-center [&>*]:p-2">
+    <div class="text-white">
       <a href="/" class="text-2xl font-bold">
         One Step Ahead Referral Tracker &raquo;
       </a>

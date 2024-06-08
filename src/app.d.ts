@@ -12,6 +12,28 @@ declare global {
 	namespace grecaptcha {
 		declare function getResponse(widgetId?: number): any
 	}
+
+	declare interface FormResponse {
+		id: string;
+		data: {
+			child: {
+				name: string;
+				teacher: string;
+				school: string;
+				grade: 0 | 1 | 2 | 3 | 4 | 5;
+			};
+			parent: {
+				name: string;
+				email: string;
+				phone: string;
+			};
+			math: boolean;
+			reading: boolean;
+			story: string;
+			uploaded: string;
+			completed: boolean;
+		}
+	}
 }
 
 export { };

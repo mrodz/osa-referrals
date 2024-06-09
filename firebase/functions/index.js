@@ -8,8 +8,6 @@ const {
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
-const { getDocs, collection } = require("firebase/firestore");
-const cors = require("cors");
 
 initializeApp();
 setGlobalOptions({
@@ -165,12 +163,6 @@ exports.recordResponse = https.onRequest(async (req, res) => {
   }
 });
 
-const corsOptions = {
-  credentials: true,
-  allowedHeaders: ["Authorization", "Content-Type"],
-  exposedHeaders: ["Authorization"],
-};
-
 exports.loadAllResponses = https.onRequest({ cors: true }, async (req, res) => {
   res.set(
     "Access-Control-Allow-Origin",
@@ -283,3 +275,180 @@ exports.beforecreated = identity.beforeUserCreated(
     }
   }
 );
+
+exports.markCompleted = https.onRequest({ cors: true }, async (req, res) => {
+  let body;
+  try {
+    body = JSON.parse(req.body);
+  } catch (e) {
+    res.status(400).json({
+      error: "body is not JSON",
+    });
+    return;
+  }
+
+  if (!("id" in body)) {
+    res.status(400).json({
+      error: "Missing `id` parameter",
+    });
+    return;
+  }
+
+  res.set(
+    "Access-Control-Allow-Origin",
+    process.env.FUNCTIONS_EMULATOR === "true"
+      ? "*"
+      : "https://referrals.onestepaheadculvercity.org/"
+  );
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "content-type, authorization");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.headers?.authorization === undefined) {
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+    return;
+  }
+
+  if (!req.headers.authorization.startsWith("Bearer ")) {
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+    return;
+  }
+
+  const jwt = req.headers.authorization.substring(7);
+
+  let decoded;
+
+  try {
+    decoded = await getAuth().verifyIdToken(jwt);
+  } catch (e) {
+    logger.error(e);
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+  }
+
+  logger.info(`Marking completion from user ${JSON.stringify(decoded)}`);
+
+  try {
+    const snapshot = await getFirestore().collection("responses").doc(body.id);
+
+    const ref = await snapshot.get();
+
+    if (!ref.exists) {
+      res.status(404).json({
+        error: `no document with id ${body.id}`,
+      });
+      return;
+    }
+
+    const completed = !(ref.data()?.completed ?? false);
+    const completedAt = completed ? new Date().toUTCString() : "Never";
+
+    await snapshot.update({
+      completed,
+      completedAt,
+    });
+
+    res.status(200).json({
+      completed,
+      completedAt,
+    });
+  } catch (e) {
+    logger.error(e);
+    res.status(500).json({
+      error: "A server-side error occured",
+    });
+  }
+});
+
+exports.deleteResponse = https.onRequest({ cors: true }, async (req, res) => {
+  let body;
+  try {
+    body = JSON.parse(req.body);
+  } catch (e) {
+    res.status(400).json({
+      error: "body is not JSON",
+    });
+    return;
+  }
+
+  if (!("id" in body)) {
+    res.status(400).json({
+      error: "Missing `id` parameter",
+    });
+    return;
+  }
+
+  res.set(
+    "Access-Control-Allow-Origin",
+    process.env.FUNCTIONS_EMULATOR === "true"
+      ? "*"
+      : "https://referrals.onestepaheadculvercity.org/"
+  );
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "content-type, authorization");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.headers?.authorization === undefined) {
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+    return;
+  }
+
+  if (!req.headers.authorization.startsWith("Bearer ")) {
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+    return;
+  }
+
+  const jwt = req.headers.authorization.substring(7);
+
+  let decoded;
+
+  try {
+    decoded = await getAuth().verifyIdToken(jwt);
+  } catch (e) {
+    logger.error(e);
+    res.status(403).json({
+      error: "Unauthorized",
+    });
+  }
+
+  logger.info(`Marking completion from user ${JSON.stringify(decoded)}`);
+
+  try {
+    const snapshot = await getFirestore().collection("responses").doc(body.id);
+
+    const ref = await snapshot.get();
+
+    if (!ref.exists) {
+      res.status(404).json({
+        error: `no document with id ${body.id}`,
+      });
+      return;
+    }
+
+    const result = await snapshot.delete();
+
+    res.status(200).json(result);
+  } catch (e) {
+    logger.error(e);
+    res.status(500).json({
+      error: "A server-side error occured",
+    });
+  }
+});

@@ -32,6 +32,7 @@ declare global {
 			story: string;
 			uploaded: string;
 			completed: boolean;
+			completedAt: string | undefined | "Never";
 		}
 	}
 }

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { PUBLIC_RECORD_RESPONSE_URL } from "$env/static/public";
 
   let parentName: string;
   let parentEmail: string;
@@ -12,6 +13,8 @@
   let wantsMath: boolean;
   let story: string;
 
+  let submitting: boolean = false;
+
   const onSubmit = async () => {
     const captchaObject = grecaptcha.getResponse();
 
@@ -20,9 +23,11 @@
       return;
     }
 
+    submitting = true;
+
     try {
       const x = await fetch(
-        "http://127.0.0.1:5001/osa-software/us-central1/recordResponse",
+        PUBLIC_RECORD_RESPONSE_URL,
         {
           method: "POST",
           mode: "no-cors",
@@ -54,6 +59,8 @@
       goto("/thanks");
     } catch (e) {
       console.error(e);
+    } finally {
+      submitting = false;
     }
   };
 </script>
@@ -121,7 +128,7 @@
           id="phone-input"
           aria-describedby="helper-text-explanation"
           class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
-          pattern="[0-9]{'{3}'}-[0-9]{'{3}'}-[0-9]{'{4}'}"
+          pattern="[0-9]{'{10}'}"
           placeholder="123-456-7890"
           required
         />
@@ -338,7 +345,7 @@
 
     <div class="mb-5">
       <label for="message" class="block mb-2 text-sm font-medium text-gray-900"
-        >Tell us about your child and your situation</label
+        >Tell us about your child and your situation (500 characters)</label
       >
       <textarea
         bind:value={story}
@@ -356,10 +363,15 @@
     ></div>
 
     <button
+      disabled={submitting}
       type="submit"
       class="mt-4 text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
     >
-      Submit
+      {#if submitting}
+        Please wait...
+      {:else}
+        Submit
+      {/if}
     </button>
   </form>
 </div>

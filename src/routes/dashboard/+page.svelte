@@ -1,6 +1,9 @@
 <script context="module" lang="ts">
-  let formResponse: Promise<FormResponse[] | null> | undefined;
-  let lastQuery: Date | undefined;
+  import { writable, type Writable } from "svelte/store";
+
+  let formResponse: Writable<Promise<FormResponse[] | null> | undefined> =
+    writable(undefined);
+  let lastQuery: Writable<Date | undefined> = writable(undefined);
 </script>
 
 <script lang="ts">
@@ -31,10 +34,10 @@
     }
 
     if (
-      lastQuery === undefined ||
-      new Date().getTime() - lastQuery.getTime() > 30000
+      $lastQuery === undefined ||
+      new Date().getTime() - $lastQuery.getTime() > 30000
     ) {
-      formResponse = (async () => {
+      $formResponse = (async () => {
         jwt = await currentUser.getIdToken();
 
         const response = await fetch(PUBLIC_LOAD_ALL_RESPONSES_URL, {
@@ -63,7 +66,7 @@
           return null;
         })
         .finally(() => {
-          lastQuery = new Date();
+          $lastQuery = new Date();
           return null;
         });
     } else {
@@ -100,7 +103,7 @@
         throw new Error(JSON.stringify(object));
       }
 
-      formResponse = formResponse?.then?.((formResponses) => {
+      $formResponse = $formResponse?.then?.((formResponses) => {
         if (formResponses === null) {
           return null;
         }
@@ -151,8 +154,9 @@
         throw new Error(JSON.stringify(object));
       }
 
-      formResponse = formResponse?.then((formResponse) =>
-        formResponse?.filter?.((response) => response.id !== r.id) ?? null
+      $formResponse = $formResponse?.then(
+        (formResponse) =>
+          formResponse?.filter?.((response) => response.id !== r.id) ?? null
       );
     } catch (e) {
       alert("Could not delete response");
@@ -177,16 +181,14 @@
         Dashboard
       </h1>
 
-      {#if formResponse === undefined}
+      {#if $formResponse === undefined}
         <p>Waiting for browser to send request...</p>
       {:else}
-        {#await formResponse}
+        {#await $formResponse}
           <p>Loading resources...</p>
         {:then formResponse}
           {#if formResponse === null}
-            <p>
-              Could not resolve form responses.
-            </p>
+            <p>Could not resolve form responses.</p>
           {:else if formResponse.length ?? 0 !== 0}
             <div
               class="relative overflow-x-auto shadow-md sm:rounded-lg h-full"

@@ -42,10 +42,10 @@
   const signUp = async () => {
     disabled = true;
 
-	if (password !== passwordConfirm) {
-		alert("Passwords do not match");
-		return;
-	}
+    if (password !== passwordConfirm) {
+      alert("Passwords do not match");
+      return;
+    }
 
     try {
       const auth = getAuth();
@@ -67,14 +67,22 @@
       goto("/dashboard");
     } catch (e) {
       if (e !== null && typeof e === "object" && "code" in e) {
-        if (e.code === "auth/invalid-email") {
-          alert("Could not create account: invalid email");
-        } else if (e.code === "auth/internal-error") {
-          alert("Bad code");
-          console.error(e);
-        } else {
-          alert("Unknown error");
-          console.error(e);
+        console.error(e);
+        switch (e.code) {
+          case "auth/invalid-email":
+            alert("Could not create account: invalid email");
+            break;
+          case "auth/internal-error":
+            alert("Bad code");
+            break;
+          case "auth/email-already-in-use":
+            alert("This email is already in use");
+            break;
+          case "auth/too-many-requests":
+            alert("We are receiving high volumes of traffic right now. Please try again later.");
+            break;
+          default:
+            alert("Unknown error");
         }
       } else {
         alert("Could not create account");
@@ -90,9 +98,7 @@
   <div
     class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
   >
-    <div
-      class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0"
-    >
+    <div class="w-full bg-white rounded-lg shadow md:mt-0 sm:max-w-md xl:p-0">
       <div
         class="p-6 space-y-4 md:space-y-6 sm:p-8"
         style={disabled ? "opacity: 0.5" : ""}
@@ -158,9 +164,7 @@
             />
           </div>
           <div>
-            <div
-              class="block mb-2 text-sm font-medium text-gray-900"
-            >
+            <div class="block mb-2 text-sm font-medium text-gray-900">
               OSA Secret
             </div>
             <div class="flex mb-2 space-x-2 rtl:space-x-reverse items-center">

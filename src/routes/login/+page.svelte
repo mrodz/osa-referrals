@@ -47,6 +47,7 @@
             >
             <input
               bind:value={email}
+              autocomplete="email"
               type="email"
               name="email"
               id="email"

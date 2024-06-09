@@ -168,7 +168,7 @@ exports.loadAllResponses = https.onRequest({ cors: true }, async (req, res) => {
     "Access-Control-Allow-Origin",
     process.env.FUNCTIONS_EMULATOR === "true"
       ? "*"
-      : "https://referrals.onestepaheadculvercity.org/"
+      : "https://referrals.onestepaheadculvercity.org"
   );
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "content-type, authorization");
@@ -298,7 +298,7 @@ exports.markCompleted = https.onRequest({ cors: true }, async (req, res) => {
     "Access-Control-Allow-Origin",
     process.env.FUNCTIONS_EMULATOR === "true"
       ? "*"
-      : "https://referrals.onestepaheadculvercity.org/"
+      : "https://referrals.onestepaheadculvercity.org"
   );
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "content-type, authorization");
@@ -391,7 +391,7 @@ exports.deleteResponse = https.onRequest({ cors: true }, async (req, res) => {
     "Access-Control-Allow-Origin",
     process.env.FUNCTIONS_EMULATOR === "true"
       ? "*"
-      : "https://referrals.onestepaheadculvercity.org/"
+      : "https://referrals.onestepaheadculvercity.org"
   );
   res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "content-type, authorization");

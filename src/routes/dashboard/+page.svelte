@@ -1,3 +1,8 @@
+<script context="module" lang="ts">
+  let formResponse: Promise<FormResponse[] | null> | undefined;
+  let lastQuery: Date | undefined;
+</script>
+
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { authStore } from "$lib";
@@ -9,7 +14,6 @@
     PUBLIC_DELETE_RESPONSE_URL,
   } from "$env/static/public";
 
-  let formResponse: Promise<FormResponse[]> | undefined;
   let jwt: string | undefined;
 
   onMount(() => {
@@ -26,33 +30,45 @@
       return;
     }
 
-    formResponse = (async () => {
-      jwt = await currentUser.getIdToken();
+    if (
+      lastQuery === undefined ||
+      new Date().getTime() - lastQuery.getTime() > 30000
+    ) {
+      formResponse = (async () => {
+        jwt = await currentUser.getIdToken();
 
-      const response = await fetch(PUBLIC_LOAD_ALL_RESPONSES_URL, {
-        method: "GET",
-        headers: {
-          authorization: `Bearer ${jwt}`,
-        },
-      });
+        const response = await fetch(PUBLIC_LOAD_ALL_RESPONSES_URL, {
+          method: "GET",
+          headers: {
+            authorization: `Bearer ${jwt}`,
+          },
+        });
 
-      const object: FormResponse[] | { error: string } = await response.json();
+        const object: FormResponse[] | { error: string } =
+          await response.json();
 
-      if (typeof object === "object" && "error" in object) {
-        throw new Error(object.error);
-      }
+        if (typeof object === "object" && "error" in object) {
+          throw new Error(object.error);
+        }
 
-      if (!Array.isArray(object)) {
-        throw new Error(JSON.stringify(object));
-      }
+        if (!Array.isArray(object)) {
+          throw new Error(JSON.stringify(object));
+        }
 
-      return object;
-    })();
-
-    formResponse.catch((e) => {
-      console.error(e);
-      alert("Could not load responses");
-    });
+        return object;
+      })()
+        .catch((e) => {
+          console.error(e);
+          alert("Could not load responses");
+          return null;
+        })
+        .finally(() => {
+          lastQuery = new Date();
+          return null;
+        });
+    } else {
+      console.log("Using cached data");
+    }
   });
 
   let expanded: string | undefined;
@@ -84,7 +100,11 @@
         throw new Error(JSON.stringify(object));
       }
 
-      formResponse = formResponse?.then((formResponses) => {
+      formResponse = formResponse?.then?.((formResponses) => {
+        if (formResponses === null) {
+          return null;
+        }
+
         return formResponses.map((response) => {
           if (response.id === documentId) {
             response.data.completed = object.completed;
@@ -132,7 +152,7 @@
       }
 
       formResponse = formResponse?.then((formResponse) =>
-        formResponse.filter((response) => response.id !== r.id)
+        formResponse?.filter?.((response) => response.id !== r.id) ?? null
       );
     } catch (e) {
       alert("Could not delete response");
@@ -149,8 +169,8 @@
 {#if !$authStore.isLoggedIn}
   You can't access this page.
 {:else}
-  <div class="flex flex-col items-center px-6 py-8 mx-auto h-screen">
-    <main class="w-full bg-white rounded-lg shadow p-4 h-full">
+  <div class="flex flex-col items-center px-6 py-8 mx-auto h-screen mb-8">
+    <main class="w-full bg-white rounded-lg shadow p-4 h-full mb-8">
       <h1
         class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl mb-4"
       >
@@ -163,7 +183,11 @@
         {#await formResponse}
           <p>Loading resources...</p>
         {:then formResponse}
-          {#if formResponse.length !== 0}
+          {#if formResponse === null}
+            <p>
+              Could not resolve form responses.
+            </p>
+          {:else if formResponse.length ?? 0 !== 0}
             <div
               class="relative overflow-x-auto shadow-md sm:rounded-lg h-full"
             >
@@ -315,6 +339,8 @@
           {:else}
             <p>No responses recorded.</p>
           {/if}
+        {:catch}
+          <p>Error loading responses.</p>
         {/await}
       {/if}
     </main>

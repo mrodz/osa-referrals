@@ -1,38 +1,17 @@
-# create-svelte
+# Referral site for One Step Ahead
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+This is a quick CRUD app to streamline the referral process for OSA. This page can be embedded in an `<iframe>` by adding `?embed` to the parameters of any route. It uses Firebase and Firestore for backend.
 
-## Creating a project
+## Parent Form
+![image](https://github.com/mrodz/osa-referrals/assets/79176075/dfbed40b-52ba-4ecc-a08e-8af084447bb6)
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Create admin account
+You need to know our organizational password to create an account. Reach out to Lila or Mateo to get the password.
+![image](https://github.com/mrodz/osa-referrals/assets/79176075/c5529c34-c340-4a93-a9a2-13ff05879c2d)
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+## Sign in to admin dashboard
+![image](https://github.com/mrodz/osa-referrals/assets/79176075/f51e5a85-dd30-471b-b7da-62588b8b47e1)
 
-# create a new project in my-app
-npm create svelte@latest my-app
-```
+## Dashboard view to manage responses (censored for privacy)
+![image](https://github.com/mrodz/osa-referrals/assets/79176075/879cd534-5466-43de-b8dc-72d1ca2c4f64)
 
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.

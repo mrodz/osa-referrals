@@ -236,14 +236,14 @@
                         {response.data.parent.name}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
+                        {response.data.parent.phone}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
                         {#if response.data.reducedLunch}
                           <span class="text-green-500">Yes</span>
                         {:else}
                           <span class="text-red-500">No</span>
                         {/if}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        {response.data.parent.phone}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         {response.data.child.name}

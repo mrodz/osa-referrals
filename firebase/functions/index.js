@@ -83,7 +83,15 @@ exports.recordResponse = https.onRequest(async (req, res) => {
     return;
   }
 
-  const { parent, child, math, reading, story } = body;
+  let parent, child, math, reading, story, reducedLunch, relationship;
+
+  try {
+    ({ parent, child, math, reading, story, reducedLunch, relationship } =
+      body);
+  } catch (e) {
+    res.status(400).send("Bad request");
+    return;
+  }
 
   if (
     typeof parent !== "object" ||
@@ -132,6 +140,20 @@ exports.recordResponse = https.onRequest(async (req, res) => {
   if (typeof story !== "string" || story.length > 600) {
     console.error("#5", story);
     res.status(413).send("story too big");
+    return;
+  }
+
+  if (typeof reducedLunch !== "boolean") {
+    res.status(400).send("reducedLunch is boolean");
+    return;
+  }
+
+  if (
+    typeof relationship !== "number" ||
+    ![0, 1, 2, 3].includes(relationship)
+  ) {
+    res.status(400).send("relationship is (0 | 1 | 2 | 3)");
+    return;
   }
 
   try {
@@ -152,6 +174,8 @@ exports.recordResponse = https.onRequest(async (req, res) => {
       story,
       uploaded: new Date().toUTCString(),
       completed: false,
+      reducedLunch,
+      relationship,
     });
 
     logger.debug(result);

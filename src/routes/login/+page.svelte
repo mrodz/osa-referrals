@@ -11,6 +11,13 @@
   let password: string;
 
   const onSubmit = async () => {
+    const captchaObject = grecaptcha.getResponse();
+
+    if (typeof captchaObject !== "string" || captchaObject.length === 0) {
+      alert("Please confirm that you are not a robot");
+      return;
+    }
+
     const auth = getAuth();
 
     try {
@@ -23,6 +30,10 @@
     }
   };
 </script>
+
+<svelte:head>
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</svelte:head>
 
 <section>
   <div
@@ -72,6 +83,12 @@
               class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
               required
             />
+          </div>
+          <div class="flex justify-center">
+            <div
+              class="g-recaptcha"
+              data-sitekey="6LfIg_MpAAAAAEdV_qC4D8twNrHyjJ9-qVYUNsT9"
+            ></div>
           </div>
           <button
             type="submit"

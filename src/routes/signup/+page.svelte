@@ -40,6 +40,13 @@
   let disabled = false;
 
   const signUp = async () => {
+    const captchaObject = grecaptcha.getResponse();
+
+    if (typeof captchaObject !== "string" || captchaObject.length === 0) {
+      alert("Please confirm that you are not a robot");
+      return;
+    }
+
     disabled = true;
 
     if (password !== passwordConfirm) {
@@ -79,7 +86,9 @@
             alert("This email is already in use");
             break;
           case "auth/too-many-requests":
-            alert("We are receiving high volumes of traffic right now. Please try again later.");
+            alert(
+              "We are receiving high volumes of traffic right now. Please try again later."
+            );
             break;
           default:
             alert("Unknown error");
@@ -93,6 +102,10 @@
     }
   };
 </script>
+
+<svelte:head>
+	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</svelte:head>
 
 <section>
   <div
@@ -264,6 +277,13 @@
               </div>
             </div>
           </div>
+          <div class="flex justify-center">
+            <div
+              class="g-recaptcha"
+              data-sitekey="6LfIg_MpAAAAAEdV_qC4D8twNrHyjJ9-qVYUNsT9"
+            ></div>
+          </div>
+
           <button
             {disabled}
             type="submit"

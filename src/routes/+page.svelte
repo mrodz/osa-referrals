@@ -1,5 +1,7 @@
 <script lang="ts">
   import { authStore } from "$lib";
+  import { page } from "$app/stores";
+  import Form from "./Form.svelte";
 </script>
 
 <div class="overflow-auto flex flex-col items-center mb-8">
@@ -24,36 +26,41 @@
     follow the instructions below:
   </section>
 
-  <hr
-    class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10"
-  />
+  <hr class="w-48 h-1 mx-auto my-4 bg-gray-100 border-0 rounded md:my-10" />
 
-  <section id="selection-tray" class="w-full grid grid-cols-1 min-[700px]:grid-cols-2 gap-2 lg:gap-8 mb-8">
-    <div class="flex flex-col items-center">
-      <a href="/teachers" class="bg-blue-100 hover:bg-blue-400">
-        <header class="text-center font-bold">
-          Teachers and Administrators
-        </header>
-      </a>
-      <p>
-        Please contact your school's Site-Based Instructional Lead and ask them
-        to refer the student you have in mind to our program. If you school does
-        not currently have a Site-Based Instructional Lead or if you are unable
-        to contact them, please click above
-      </p>
-    </div>
-    <div class="flex flex-col items-center">
-      <a href="/parents" class="bg-yellow-100 hover:bg-yellow-400">
-        <header class="text-center font-bold">Parents</header>
-      </a>
-      <p>
-        Please contact your student's teacher and ask them to refer your student
-        to our program. If your teacher doesn't respond or has not been
-        connected to their school's Site-Based Instructional Lead and our
-        program, please click above
-      </p>
-    </div>
-  </section>
+  {#if $page.url.searchParams.has("embed")}
+    <Form />
+  {:else}
+    <section
+      id="selection-tray"
+      class="w-full grid grid-cols-1 min-[700px]:grid-cols-2 gap-2 lg:gap-8 mb-8"
+    >
+      <div class="flex flex-col items-center">
+        <a href="/teachers" class="bg-blue-100 hover:bg-blue-400">
+          <header class="text-center font-bold">
+            Teachers and Administrators
+          </header>
+        </a>
+        <p>
+          Please contact your school's Site-Based Instructional Lead and ask
+          them to refer the student you have in mind to our program. If you
+          school does not currently have a Site-Based Instructional Lead or if
+          you are unable to contact them, please click above
+        </p>
+      </div>
+      <div class="flex flex-col items-center">
+        <a href="/parents" class="bg-yellow-100 hover:bg-yellow-400">
+          <header class="text-center font-bold">Parents</header>
+        </a>
+        <p>
+          Please contact your student's teacher and ask them to refer your
+          student to our program. If your teacher doesn't respond or has not
+          been connected to their school's Site-Based Instructional Lead and our
+          program, please click above
+        </p>
+      </div>
+    </section>
+  {/if}
 </div>
 
 <style>

@@ -60,40 +60,44 @@
 </script>
 
 <div>
-  <header class="bg-[#475a3e] grid grid-cols-[1fr_auto] items-center [&>*]:p-2">
-    <div class="text-white">
-      <a href="/" class="text-2xl font-bold">
-        One Step Ahead Referral Tracker &raquo;
-      </a>
-      {($page.route.id?.substring(1) ?? "") === ""
-        ? "home"
-        : $page.route.id?.substring(1)}
-    </div>
+  {#if !$page.url.searchParams.has("embed")}
+    <header
+      class="bg-[#475a3e] grid grid-cols-[1fr_auto] items-center [&>*]:p-2"
+    >
+      <div class="text-white">
+        <a href="/" class="text-2xl font-bold">
+          One Step Ahead Referral Tracker &raquo;
+        </a>
+        {($page.route.id?.substring(1) ?? "") === ""
+          ? "home"
+          : $page.route.id?.substring(1)}
+      </div>
 
-    <div>
-      {#if !$authStore.isLoggedIn}
-        <button class="btn" on:click={loginButton}>
-          <span class="hidden sm:block">
-            You are not signed in
-          </span>
-          <span class="block sm:hidden">
-            Sign in
-          </span>
-        </button>
-      {:else}
-        <button class="btn-empty" on:click={logoutButton}>
-          Sign Out
-          <span class="hidden sm:block">
-            {$authStore?.user?.email ?? "Guest"}
-          </span>
-        </button>
-      {/if}
-    </div>
-  </header>
+      <div>
+        {#if !$authStore.isLoggedIn}
+          <button class="btn" on:click={loginButton}>
+            <span class="hidden sm:block"> You are not signed in </span>
+            <span class="block sm:hidden"> Sign in </span>
+          </button>
+        {:else}
+          <button class="btn-empty" on:click={logoutButton}>
+            Sign Out
+            <span class="hidden sm:block">
+              {$authStore?.user?.email ?? "Guest"}
+            </span>
+          </button>
+        {/if}
+      </div>
+    </header>
+  {/if}
 
   <slot />
 </div>
 
 <footer class="bottom-0 fixed bg-gray-200 w-full p-1">
-    Made by Mateo Rodriguez (<a class="hover:underline" href="https://github.com/mrodz" target="_blank">GitHub</a>) &copy;2024
+  Made by Mateo Rodriguez (<a
+    class="hover:underline"
+    href="https://github.com/mrodz"
+    target="_blank">GitHub</a
+  >) &copy;2024
 </footer>

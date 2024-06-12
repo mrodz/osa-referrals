@@ -33,6 +33,8 @@ declare global {
 			uploaded: string;
 			completed: boolean;
 			completedAt: string | undefined | "Never";
+			reducedLunch: boolean;
+			relationship: 0 | 1 | 2 | 3;
 		}
 	}
 }

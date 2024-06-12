@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { PUBLIC_RECORD_RESPONSE_URL } from "$env/static/public";
+  import { page } from "$app/stores";
 
   let parentName: string;
   let parentEmail: string;
@@ -87,7 +88,10 @@
       alert(
         "Your response was recorded! We will write you via email within the next few business days; please check your inbox."
       );
-      goto("/thanks");
+
+      const isEmbedded = $page.url.searchParams.has("embed");
+
+      goto(`/thanks/${isEmbedded ? "?embed" : ""}`);
     } catch (e) {
       console.error(e);
     } finally {
@@ -97,7 +101,7 @@
 </script>
 
 <svelte:head>
-	<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </svelte:head>
 
 <form class="max-w-sm mx-auto mb-14" on:submit|preventDefault={onSubmit}>
@@ -358,7 +362,7 @@
 
   <div class="mb-5">
     <label for="grade" class="block mb-2 text-sm font-medium text-gray-900">
-      Child's grade (2nd-5th) 
+      Child's grade (2nd-5th)
     </label>
     <fieldset id="grade">
       <legend class="sr-only">Child's Grade</legend>

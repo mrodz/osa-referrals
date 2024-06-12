@@ -201,6 +201,7 @@
                     <th scope="col" class="px-6 py-3"> Parent Email </th>
                     <th scope="col" class="px-6 py-3"> Parent Name </th>
                     <th scope="col" class="px-6 py-3"> Parent Phone </th>
+                    <th scope="col" class="px-6 py-3"> F/RP Lunch </th>
                     <th scope="col" class="px-6 py-3"> Student Name </th>
                     <th scope="col" class="px-6 py-3"> Grade </th>
                     <th scope="col" class="px-6 py-3"> Reading </th>
@@ -233,6 +234,13 @@
                       </th>
                       <td class="px-6 py-4 whitespace-nowrap">
                         {response.data.parent.name}
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap">
+                        {#if response.data.reducedLunch}
+                          <span class="text-green-500">Yes</span>
+                        {:else}
+                          <span class="text-red-500">No</span>
+                        {/if}
                       </td>
                       <td class="px-6 py-4 whitespace-nowrap">
                         {response.data.parent.phone}
@@ -317,6 +325,20 @@
                             and your situation"
                           </header>
                           {response.data.story}
+                        </section>
+                        <section>
+                          <header class="text-md">
+                            &rsaquo; Relationship to student
+                          </header>
+                          {#if response.data.relationship === 0}
+                            Parent
+                          {:else if response.data.relationship === 1}
+                            Teacher
+                          {:else if response.data.relationship === 2}
+                            School Resource Officer
+                          {:else}
+                            Other
+                          {/if}
                         </section>
                         <section>
                           <header class="text-md">
